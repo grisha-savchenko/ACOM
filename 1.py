@@ -19,13 +19,28 @@ class Fraction:
             self.denominator *= -1
 
     def __str__(self):
+        if self.numerator % self.denominator == 0:
+            return f"{self.numerator // self.denominator}"
         return f"{self.numerator}/{self.denominator}"
     
     def __abs__(self):
         return Fraction(abs(self.numerator), abs(self.denominator))
         
     def __repr__(self):
+        if self.numerator % self.denominator == 0:
+            return f"{self.numerator // self.denominator}"
         return f"{self.numerator}/{self.denominator}"
+    
+    def __neg__(self):
+        cnt = 0
+        if self.numerator < 0:
+            cnt += 1
+        if self.denominator < 0:
+            cnt += 1
+        if cnt % 2 == 0:
+            return Fraction(-abs(self.numerator), abs(self.denominator))
+        else:
+            return Fraction(abs(self.numerator), abs(self.denominator))
 
     def __add__(self, other):
         new_numerator = self.numerator * other.denominator + other.numerator * self.denominator
@@ -133,29 +148,76 @@ def f(matrix, k, s, m, n):
             matrix[i][j] -= matrix[k][j]*matrix[i][s]
     return matrix
 
+def print_answer(matrix, m, n):
+    for i in range(m):
+        print(f"x_{i+1} =", end=' ')
+        print(f"{matrix[i][n-1]}", end=' ')
+        for j in range(i):
+            if matrix[i][j] > 0:
+                print(f"- {matrix[i][j]}*x_{j+1}", end=' ')
+            elif matrix[i][j] < 0:
+                print(f"+ {-matrix[i][j]}*x_{j+1}", end=' ')
+        for j in range(i+1, n-1):
+            if matrix[i][j] > 0:
+                print(f"- {matrix[i][j]}*x_{j+1}", end=' ')
+            elif matrix[i][j] < 0:
+                print(f"+ {-matrix[i][j]}*x_{j+1}", end=' ')
+        print()
+    print()
+
+def print_matrix(matrix, m, n, i):
+    print(f"Шаг номер {i}:")
+    for i in range(m):
+        for j in range(n):
+            print(matrix[i][j], end=' ')
+        print()
+    print()
+
+def none(matrix, m, n):
+    for i in range(m):
+        flag = True
+        for j in range(n-1):
+            if matrix[i][j] != 0:
+                flag = False
+        if flag and matrix[i][n-1] != 0:
+            return True
+    return False
+
 def solve(m, n, matrix):
     r, s, k = m, 0, 0
+    flag = False
     while k < r:
-        idx = mx_idx(matrix, k, s, m)
+        idx = mx_idx(matrix, k, s, r)
         if idx != -1:
             matrix = swap(matrix, idx, k)
             matrix = div(matrix, k, s, n)
-            matrix = f(matrix, k, s, m, n)
-            for i in range(m):
+            matrix = f(matrix, k, s, r, n)
+            for i in range(r):
                 if i == k: continue
-                matrix[i][s] = 0
-            for i in range(k+1, m):
+                matrix[i][s] = Fraction(0)
+                i = k+1
+            while i < r:
                 if null(matrix, i, n):
                     matrix.pop(i)
                     r-=1
-                    m-=1
+                i += 1
             if k < r:
                 k += 1
                 s += 1
         else:
             s += 1
-    for i in range(m):
-        print(matrix[i])
+        print_matrix(matrix, m, n, k)
+        if none(matrix, r, n):
+                flag = True
+                break
+    if flag:
+        print("Система не имеет решений:")
+    else:
+        if m == r:
+            print("Система имеет единственное решение:")
+        elif r < m:
+            print("Система имеет бесконечное множество решений:")
+        print_answer(matrix, r, n)
 
 
 
@@ -175,7 +237,7 @@ def main():
         # my_print(t, par, matrixs)
 
     except FileNotFoundError:
-        print("Ошибка: файл 'filename.txt' не найден.")
+        print(f"Ошибка: файл {filename} не найден.")
 
 if __name__ == "__main__":
     main()
