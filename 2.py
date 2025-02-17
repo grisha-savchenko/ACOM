@@ -183,11 +183,60 @@ def none(matrix, m, n):
             return True
     return False
 
+def PositiveRight(matrix, m, n):
+    for i in range(m):
+        if matrix[i][n-1] < 0
+            matrix[i][n-1] *= -1
+    return matrix
+
+def SelectingAResolutionElement(matrix, m, n, s):
+    idx = -1
+    mn = max([max(x) for x in matrix])
+    for i in range(m):
+        t = matrix[i][s]/matrix[i][n-1]
+        if t > 0 :
+            if mn > t:
+                mn = t
+                idx = i
+    return idx
+
+def factorial(x):
+    ret = 1
+    for i in range(2, x+1):
+        ret *= i
+    return ret
+   
+def CombinationsWithoutRepetitions(r, n):
+    start = [0]*n
+    n-=1
+    for i in range(n+1):
+        start[i] = i
+    ret = [start]
+    old = r - 1
+    new = r - 1
+    while old > -1:
+        while old == new:
+            start[old] += 1
+            ret.append(start)
+            if old == n:
+                new -= 1
+                start[new] += 1
+                for i in range(new+1, n+1):
+                    start[i] = start[i-1]+1       
+                ret.append(start)
+            if start[new] == n:
+                old = r
+                new = r
+            else:
+                old = new
+    return ret
+      
 def solve(m, n, matrix):
     r, s, k = m, 0, 0
     flag = False
+    matrix = PositiveRight(matrix, m, n)
     while k < r:
-        idx = mx_idx(matrix, k, s, r)
+        idx = SelectingAResolutionElement(matrix, m, n, s)
         if idx != -1:
             matrix = swap(matrix, idx, k)
             matrix = div(matrix, k, s, n)
@@ -195,7 +244,7 @@ def solve(m, n, matrix):
             for i in range(r):
                 if i == k: continue
                 matrix[i][s] = Fraction(0)
-                i = k+1
+            i = k+1
             while i < r:
                 if null(matrix, i, n):
                     matrix.pop(i)
@@ -206,20 +255,50 @@ def solve(m, n, matrix):
                 s += 1
         else:
             s += 1
-        print_matrix(matrix, m, n, k)
+        # print_matrix(matrix, m, n, k)
         if none(matrix, r, n):
                 flag = True
                 break
-    if flag:
-        print("Система не имеет решений:")
-    else:
-        if m == r:
-            print("Система имеет единственное решение:")
-        elif r < m:
-            print("Система имеет бесконечное множество решений:")
-        print_answer(matrix, r, n)
-
-
+    
+    c = factorial(n-1)/(factorial(n-1-r)*factorial(r))
+    combs = CombinationsWithoutRepetitions(r, n-1)
+    idxs = [-1]*r
+    answer = []
+    
+    for comb in combs:
+        mns = []
+        for x in comb:
+            msn.append(SelectingAResolutionElement(matrix, m, n, x))
+            flag = False
+            for mn in mns:
+                if mn == -1 or mns.count(mn) > 1:
+                    flag = True
+                    break
+                else:
+                    matrix = div(matrix, mn, x, n)
+                    matrix = f(matrix, mn, x, r, n)
+                    for i in range(r):
+                        if i == mn: continue
+                        matrix[i][s] = Fraction(0)
+        if flag:
+            print("решения нет")
+        else:
+            print(f"решение{comb}:")
+        for x in comb:
+            print(f"x{x} = {matrix[n-1]}")
+        print()
+    print()
+        
+    
+    # if flag:
+    #     print("Система не имеет решений:")
+    # else:
+    #     if m == r:
+    #         print("Система имеет единственное решение:")
+    #     elif r < m:
+    #         print("Система имеет бесконечное множество решений:")
+    #     print_answer(matrix, r, n)
+    
 
 
 def main():
