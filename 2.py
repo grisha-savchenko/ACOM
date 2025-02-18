@@ -207,28 +207,27 @@ def factorial(x):
     return ret
    
 def CombinationsWithoutRepetitions(r, n):
-    start = [0]*n
-    n-=1
-    for i in range(n+1):
+    ret = []
+    start = [0]*r
+    for i in range(r):
         start[i] = i
-    ret = [start]
-    old = r - 1
-    new = r - 1
-    while old > -1:
-        while old == new:
-            start[old] += 1
-            ret.append(start)
-            if old == n:
-                new -= 1
-                start[new] += 1
-                for i in range(new+1, n+1):
-                    start[i] = start[i-1]+1       
-                ret.append(start)
-            if start[new] == n:
-                old = r
-                new = r
-            else:
-                old = new
+    ret.append(start)
+    print(start)
+    r-=1
+    n-=1
+    k = r
+    p = k
+    while start[0] != n-r:
+        if start[r] != n:
+            p = k
+            start[r] += 1
+        else:
+            p -= 1
+            start[p] += 1 
+            for i in range(p+1, r+1):
+                start[i] = start[i-1] + 1
+        ret.append(start)
+        print(start)
     return ret
       
 def solve(m, n, matrix):
